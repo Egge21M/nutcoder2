@@ -1,11 +1,18 @@
-import { bytesToHex } from "@noble/hashes/utils";
-import { decodeCBOR } from "./cbor";
-import { Token, TokenEntry, V4InnerToken, V4ProofTemplate } from "./types";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { decodeCBOR, encodeCBOR } from "./cbor";
+import {
+  Proof,
+  Token,
+  TokenEntry,
+  TokenV4Template,
+  V4InnerToken,
+  V4ProofTemplate,
+} from "./types";
 
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
-function utf8ToBase64url(str) {
+function utf8ToBase64url(str: string) {
   const utf8Bytes = new TextEncoder().encode(str); // Convert to Uint8Array
   const base64String = btoa(String.fromCharCode(...utf8Bytes)); // Convert to base64
   return base64String
@@ -14,13 +21,13 @@ function utf8ToBase64url(str) {
     .replace(/=+$/, ""); // Remove padding
 }
 
-function utf8ToBase64(str: string) {
+export function utf8ToBase64(str: string) {
   const utf8Bytes = encoder.encode(str);
   const base64String = btoa(String.fromCharCode(...utf8Bytes));
   return base64String;
 }
 
-function base64ToUint8Array(base64) {
+export function base64ToUint8Array(base64: string) {
   const binaryString = atob(base64); // Decode base64 to binary string
   const bytes = new Uint8Array(
     [...binaryString].map((char) => char.charCodeAt(0)),
@@ -28,13 +35,13 @@ function base64ToUint8Array(base64) {
   return bytes;
 }
 
-function uint8ArrayToBase64(uint8Array) {
+export function uint8ArrayToBase64(uint8Array: Uint8Array) {
   const binaryString = String.fromCharCode(...uint8Array); // Convert Uint8Array to binary string
   const base64String = btoa(binaryString); // Convert binary string to base64
   return base64String;
 }
 
-function base64ToUtf8(base64: string) {
+export function base64ToUtf8(base64: string) {
   const binaryString = atob(base64);
   const bytes = new Uint8Array(
     [...binaryString].map((char) => char.charCodeAt(0)),
@@ -43,7 +50,7 @@ function base64ToUtf8(base64: string) {
   return utf8String;
 }
 
-function base64urlToUtf8(base64url) {
+function base64urlToUtf8(base64url: string) {
   const base64 = base64url
     .replace(/-/g, "+") // Replace - with +
     .replace(/_/g, "/"); // Replace _ with /
@@ -56,7 +63,7 @@ function base64urlToUtf8(base64url) {
   return utf8String;
 }
 
-function uint8ArrayToBase64url(uint8Array) {
+export function uint8ArrayToBase64url(uint8Array: Uint8Array) {
   const binaryString = String.fromCharCode(...uint8Array); // Convert Uint8Array to binary string
   const base64String = btoa(binaryString); // Convert to base64
   return base64String
@@ -65,7 +72,7 @@ function uint8ArrayToBase64url(uint8Array) {
     .replace(/=+$/, ""); // Remove padding
 }
 
-function base64urlToUint8Array(base64url) {
+function base64urlToUint8Array(base64url: string) {
   const base64 = base64url
     .replace(/-/g, "+") // Replace - with +
     .replace(/_/g, "/"); // Replace _ with /
@@ -92,7 +99,7 @@ export function getEncodedTokenV3(token: Token): string {
   return "cashu" + "A" + utf8ToBase64url(JSON.stringify(token));
 }
 
-function getEncodedTokenV4(token: Token): string {
+export function getEncodedTokenV4(token: Token): string {
   const idMap: { [id: string]: Array<Proof> } = {};
   let mint: string | undefined = undefined;
   for (let i = 0; i < token.token.length; i++) {
@@ -136,7 +143,7 @@ function getEncodedTokenV4(token: Token): string {
   const encodedData = encodeCBOR(tokenTemplate);
   const prefix = "cashu";
   const version = "B";
-  const base64Data = encodeUint8toBase64Url(encodedData);
+  const base64Data = uint8ArrayToBase64url(encodedData);
   return prefix + version + base64Data;
 }
 

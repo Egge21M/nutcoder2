@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { getDecodedToken, getEncodedTokenV3 } from "./token";
+import { useState } from "react";
+import { getDecodedToken, getEncodedTokenV3, getEncodedTokenV4 } from "./token";
 
 function App() {
   const [token, setToken] = useState("");
@@ -15,6 +15,13 @@ function App() {
     if (objectString) {
       const parsed = JSON.parse(objectString);
       setToken(getEncodedTokenV3(parsed));
+    }
+  }
+
+  function onObjectToV4Token() {
+    if (objectString) {
+      const parsed = JSON.parse(objectString);
+      setToken(getEncodedTokenV4(parsed));
     }
   }
 
@@ -43,7 +50,12 @@ function App() {
         >
           To V3 Token
         </button>
-        <button className="bg-gray-600 px-2 py-1 rounded">To V4 Token</button>
+        <button
+          className="bg-gray-600 px-2 py-1 rounded"
+          onClick={onObjectToV4Token}
+        >
+          To V4 Token
+        </button>
       </div>
       <div className="bg-blue-100 grow">
         <textarea
